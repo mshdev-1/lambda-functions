@@ -1,0 +1,5 @@
+{
+    "python.pythonPath": "/Users/ahngaejoon/.local/share/virtualenvs/testEnv-mTkHJAHg/bin/python",
+    "python.formatting.provider": "black",
+    "code-runner.ignoreSelection": true
+}
