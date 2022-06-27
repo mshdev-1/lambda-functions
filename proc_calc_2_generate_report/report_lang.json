@@ -5,8 +5,9 @@
         "calc" : "정산",
         "sheet_summary" : "정산서",
         "sheet_detail" : "상세내역",
-        "summary_1_total" : "1. 정산 안내",
-        "summary_2_detail" : "2. 정산 내역",
+        "summary_title" : "{0}년 {1}월 정산",
+        "summary_1_total_title" : "1. 정산 안내",
+        "summary_2_detail_title" : "2. 정산 내역",
         "summary_3_prepayments" : "3. 선급내역 (MG, 선인세, 제작비)",
         "summary_final_memo" :  "- 정산에 대한 상세 내역은 하단의 상세내역 시트에서 확인할 수 있습니다.",
         "summary_final_memo_contact" :  "- 정산관련문의 : tax@mstoryhub.com",
@@ -30,7 +31,23 @@
             "저작권자 정산금",
             "시리즈명",
             "시리즈번호",
-            "cp code"
+            "cp code",
+            "매출기준",
+            "정산구분"
+        ],
+        "sum" : "합계",
+        "summary_2_detail_4_headers" : [
+            "내용",	"매출(정산대상)(A)", "정산금(B)", "선급 차감(C)", "지급 예정(B-C)"
+        ],
+        "summary_2_detail_5_headers" : [
+            "내용",	"매출(정산대상)(A)", "차감대상(B)",	"매출-차감대상(A-B)", "정산율(C)", "정산금((A-B)*C)" 
+        ],
+        "summary_1_tax_title" : "(세금)계산서 발행 안내",
+        "summary_1_tax_headers_company" : [
+            "품목", "공급가액", "세액", "합계", "과세여부", "지급예정일"
+        ],
+        "summary_1_tax_headers_personal" : [
+            "품목", "정산금", "세액", "합계", "과세여부", "지급예정일"
         ]
     },
     "cn": {

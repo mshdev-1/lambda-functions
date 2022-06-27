@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+from turtle import title
 import pandas as pd
 
 # from io import BytesIO
@@ -14,57 +15,127 @@ sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
 
 def create_excel_file(
-    data_frame, dest_excel_file, p_sheet_name="sheet", calc_cp_info=None
+    data_frame,
+    dest_excel_file,
+    p_sheet_name="sheet",
+    calc_cp_info=None,
+    calc_month=None,
 ):
     try:
-        # print("# create_excel_file > data_frame headers : {0}".format(
-        #     data_frame.get('headers')))
-        # print("# create_excel_file > data_frame list : {0}".format(
-        #     data_frame.get('list')))
-
         df_detail = pd.DataFrame(
             data_frame.get("list"), columns=data_frame.get("headers")
         )
-        # print(df)
+
         # create excel file
         print("** create excel file : " + dest_excel_file)
-        # df.to_excel(dest_excel_file, sheet_name=p_sheet_name)
-
-        # Create a Pandas Excel writer using XlsxWriter as the engine.
-        # df_summary = pd.DataFrame([], columns=[])
-        df_summary_title = pd.DataFrame({"2022년 05월 정산": []})
 
         # create Excel file
         writer = pd.ExcelWriter(dest_excel_file, engine="xlsxwriter")
 
-        df1 = pd.DataFrame({"Data": [11, 12, 13, 14]})
-        # Position the dataframes in the worksheet.
-        df1.to_excel(writer, sheet_name="정산서")  # Default position, cell A1.
+        # # Write each dataframe to a different worksheet.
+        # df_summary_title.to_excel(
+        #     writer, sheet_name="정산서", index=False, startcol=3, startrow=6
+        # )
 
-        # Write each dataframe to a different worksheet.
-        df_summary_title.to_excel(
-            writer, sheet_name="정산서", index=False, startcol=3, startrow=6
-        )
-        # Get the xlsxwriter workbook and worksheet objects.
-        workbook = writer.book
-        worksheet_summary = writer.sheets["정산서"]
-        # summary header format
-        summary_header_format = workbook.add_format(
-            {"bold": False, "text_wrap": True, "fg_color": "#FE3004"}
-        )
-        summary_header_format.set_font_color("red")
-        # worksheet_summary.add_format(summary_header_format)
+        # # Get the xlsxwriter workbook and worksheet objects.
+        # workbook = writer.book
+        # worksheet_summary = writer.sheets["정산서"]
+        # # summary header format
+        # summary_header_format = workbook.add_format(
+        #     {"bold": False, "text_wrap": True, "fg_color": "#FE3004"}
+        # )
+        # summary_header_format.set_font_color("red")
+        # # worksheet_summary.add_format(summary_header_format)
 
         # Write the column headers with the defined format.
         # for col_num, value in enumerate(df_summary_title.columns.values):
         #     worksheet_summary.write(0, col_num + 1, value, summary_header_format)
 
         # ** generate 정산서 요약 시트 데이터 생성 처리 **
-        data_summary = data_handler.generate_calc_summary_data(
-            calc_cp_info, data_frame.get("list")
+        dic_summary = data_handler.generate_calc_summary_data(
+            calc_cp_info, data_frame.get("list"), calc_month
         )
 
-        df_detail.to_excel(writer, sheet_name=p_sheet_name, index=False)
+        # summary - 0. title
+        df_summary_title = dic_summary["df_title"]
+
+        # summary - 1. total
+        df_summary_total_title = dic_summary["total_title"]
+        df_summary_total = dic_summary["total"]
+
+        # summary - 2. detail
+        df_summary_detail_title = dic_summary["detail_title"]
+        df_summary_detail = dic_summary["detail"]
+
+        ###################################
+        #   1. sheet - summary
+        ###################################
+        sheet_summary = dic_summary["sheet_summary"]
+
+        # 0. 제목
+        df_summary_title.to_excel(
+            writer, sheet_name=sheet_summary, index=False, startcol=1, startrow=0
+        )
+        str_summary_title = list(df_summary_title.columns.values)[0]
+        print(f">> str_summary_title:{str_summary_title}\n{df_summary_title}")
+
+        workbook = writer.book
+        worksheet_summary = writer.sheets[sheet_summary]
+
+        # cell format
+        # worksheet_summary.set_column("B:G", 12)
+        worksheet_summary.hide_gridlines(2)
+        worksheet_summary.set_column("A:A", 3)
+        worksheet_summary.set_column("B:B", 35)
+        worksheet_summary.set_column("C:G", 15)
+        worksheet_summary.set_row(0, 30)
+
+        merge_format = workbook.add_format(
+            {
+                "bold": 1,
+                "border": 0,
+                "align": "center",
+                "valign": "vcenter",
+                "font_size": 14
+                # "fg_color": "yellow",
+            }
+        )
+        worksheet_summary.merge_range("B1:G1", str_summary_title, merge_format)
+
+        # 1.정산 안내
+        worksheet_summary.write(3, 1, df_summary_total_title)
+        df_summary_total.to_excel(
+            writer, sheet_name=sheet_summary, index=False, startcol=1, startrow=4
+        )
+
+        # 2.정산내역
+        worksheet_summary.write(11, 1, df_summary_detail_title)
+        df_summary_detail.to_excel(
+            writer, sheet_name=sheet_summary, index=False, startcol=1, startrow=12
+        )
+
+        ###################################
+        #   2. sheet - detail
+        ###################################
+        # sheet = 상세내역
+        # df_detail = df_detail.style.set_table_attributes(
+        #     "style='display:inline'"
+        # ).set_caption("Caption table")
+
+        cp_calc_lang = calc_cp_info[9]  # 언어
+        locale_contants = data_handler.get_locale_contants(cp_calc_lang)
+
+        sheet_detail = dic_summary["sheet_detail"]
+
+        # 최종 excel 생성 전, 불필요한 컬럼들 삭제 처리
+        # 저작권자,
+        detail_headers = locale_contants["detail_columns"]
+        detail_cp = detail_headers[1]
+        detail_cp_code = detail_headers[19]
+        df_detail = df_detail.drop(columns=[detail_cp, detail_cp_code])
+
+        # sheet 생성
+        df_detail.to_excel(writer, sheet_detail, index=False)
         # Close the Pandas Excel writer and output the Excel file.
         writer.save()
 
@@ -111,14 +182,14 @@ def create_excel_file_to_s3(data_frame, bucket, filePath, p_sheet_name="sheet"):
 
 # %%
 # process - loop data, per cp and create excel file
-
-
 def process_generate_cp_file(list_sales, dest_path, calc_month, list_calc_cp):
+    """process - loop data, per cp and create excel file"""
     try:
         final_list = []
         cp_data_list = []
         now_cp = ""
         report_index = 1
+        except_report_list = []
 
         for row in list_sales:
             # if now_cp != row["calc_cp_name"]: #calc_cp_code
@@ -151,6 +222,8 @@ def process_generate_cp_file(list_sales, dest_path, calc_month, list_calc_cp):
                 row["content_series"],
                 row["content_series_code"],
                 row["calc_cp_code"],
+                row["calc_cp_std"],
+                row["calc_cp_type_calc"],
             ]
 
             cp_data_list.append(row_list)
@@ -160,6 +233,7 @@ def process_generate_cp_file(list_sales, dest_path, calc_month, list_calc_cp):
 
         # create per cp - excel
         test_index = 0
+        except_report_index = 0
         for cp in final_list:
             # locale 정보에 따라 컬럼명 리스트 가져오기
             cp_code = cp[0][19]
@@ -171,27 +245,43 @@ def process_generate_cp_file(list_sales, dest_path, calc_month, list_calc_cp):
                 print("[Exception] not exist cp :", cp)
 
             else:
-                now_cp_detail_columns_name = data_handler.get_detail_columns_name(
-                    cp_calc_info[9]
-                )
-                data_frame = {"list": cp, "headers": now_cp_detail_columns_name}
+                # add - check 정산서 특이 사항 케이스 제외
+                flag_except_report = cp_calc_info[14]
+                if flag_except_report == 0:
+                    cp_locale = cp_calc_info[9]
+                    now_cp_detail_columns_name = data_handler.get_detail_columns_name(
+                        cp_locale
+                    )
+                    data_frame = {"list": cp, "headers": now_cp_detail_columns_name}
 
-                if not os.path.isdir(dest_path):
-                    os.mkdir(dest_path)
+                    if not os.path.isdir(dest_path):
+                        os.mkdir(dest_path)
 
-                file_name = cp[0][1] + "_" + calc_month + "_정산"
-                # excel_file_name = dest_path + "/" + cp[0][1] + ".xlsx"
-                excel_file_name = dest_path + "/" + file_name + ".xlsx"
+                    file_name = cp[0][1] + "_" + calc_month + "_정산"
+                    # excel_file_name = dest_path + "/" + cp[0][1] + ".xlsx"
+                    excel_file_name = dest_path + "/" + file_name + ".xlsx"
 
-                # execute - create excel file
-                sheet_name = "정산 내역"
-                create_excel_file(data_frame, excel_file_name, sheet_name, cp_calc_info)
+                    # execute - create excel file
+                    sheet_name = "정산 내역"
+                    create_excel_file(
+                        data_frame,
+                        excel_file_name,
+                        sheet_name,
+                        cp_calc_info,
+                        calc_month,
+                    )
 
-                # for test
-                if test_index == 10:
-                    break
+                    # for test
+                    if test_index == 10:
+                        break
 
-                test_index += 1
+                    test_index += 1
+                else:
+                    except_report_index += 1
+                    except_report_list.append(cp_calc_info)
+                    print(
+                        f"\n[Except Report] - ({except_report_index}), {cp_calc_info[3]}({cp_calc_info[1]}) "
+                    )
 
     except Exception as err:
         print("[Error] process_generate_cp_file : ", err)
