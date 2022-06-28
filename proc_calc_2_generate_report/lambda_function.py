@@ -77,30 +77,31 @@ def create_excel_file(
             writer, sheet_name=sheet_summary, index=False, startcol=1, startrow=0
         )
         str_summary_title = list(df_summary_title.columns.values)[0]
-        print(f">> str_summary_title:{str_summary_title}\n{df_summary_title}")
 
         workbook = writer.book
         worksheet_summary = writer.sheets[sheet_summary]
 
         # cell format
         # worksheet_summary.set_column("B:G", 12)
+        currency_format = workbook.add_format({"num_format": "#,##0"})
+        # worksheet_summary.set_column("C:G", currency_format)
         worksheet_summary.hide_gridlines(2)
         worksheet_summary.set_column("A:A", 3)
         worksheet_summary.set_column("B:B", 35)
-        worksheet_summary.set_column("C:G", 15)
+        worksheet_summary.set_column("C:G", 15, currency_format)
         worksheet_summary.set_row(0, 30)
 
-        merge_format = workbook.add_format(
+        cell_title_format = workbook.add_format(
             {
                 "bold": 1,
                 "border": 0,
                 "align": "center",
                 "valign": "vcenter",
-                "font_size": 14
+                "font_size": 14,
                 # "fg_color": "yellow",
             }
         )
-        worksheet_summary.merge_range("B1:G1", str_summary_title, merge_format)
+        worksheet_summary.merge_range("B1:G1", str_summary_title, cell_title_format)
 
         # 1.정산 안내
         worksheet_summary.write(3, 1, df_summary_total_title)
@@ -113,6 +114,18 @@ def create_excel_file(
         df_summary_detail.to_excel(
             writer, sheet_name=sheet_summary, index=False, startcol=1, startrow=12
         )
+
+        # 맨하단 안내 문구
+        cell_summary_common_guide_format = workbook.add_format({"font_size": 9})
+        summary_common_guide_tax = dic_summary["common_guide"]
+
+        # 시작 행 > 12 + detail row
+        row_common_start = 12 + len(df_summary_detail) + 3
+        for item in summary_common_guide_tax:
+            worksheet_summary.write(
+                row_common_start, 1, item, cell_summary_common_guide_format
+            )
+            row_common_start += 1
 
         ###################################
         #   2. sheet - detail
@@ -128,15 +141,58 @@ def create_excel_file(
         sheet_detail = dic_summary["sheet_detail"]
 
         # 최종 excel 생성 전, 불필요한 컬럼들 삭제 처리
-        # 저작권자,
+        # 저작권자,저작권자 코드, 매출기준, 정산구분
+
         detail_headers = locale_contants["detail_columns"]
         detail_cp = detail_headers[1]
         detail_cp_code = detail_headers[19]
-        df_detail = df_detail.drop(columns=[detail_cp, detail_cp_code])
+        detail_standard_sale = detail_headers[20]
+        detail_standard_calc = detail_headers[21]
+        df_detail = df_detail.drop(
+            columns=[
+                detail_cp,
+                detail_cp_code,
+                detail_standard_sale,
+                detail_standard_calc,
+            ]
+        )
 
         # sheet 생성
-        df_detail.to_excel(writer, sheet_detail, index=False)
+        df_detail.to_excel(
+            writer, sheet_name=sheet_detail, index=False, startcol=0, startrow=0
+        )
+
+        worksheet_detail = writer.sheets[sheet_detail]
+        detail_cell_hedaer_format = workbook.add_format(
+            {
+                "bold": 1,
+                "border": 1,
+                "align": "center",
+                "valign": "vcenter",
+                "font_size": 9,
+                # "pattern": 1,
+                # "bg_color": "gray",
+                "fg_color": "#d9d9d9",
+            }
+        )
+        # detail_cell_hedaer_format.set_pattern(1)
+        # worksheet_detail.set_row(1, 15, detail_cell_hedaer_format)
+        # Write the column headers with the defined format.
+        # header 부분은 set_row 함수로 전체 셀이 적용되지 않아 아래 방법으로 처리해야 함
+        for col_num, value in enumerate(df_detail.columns.values):
+            worksheet_detail.write(0, col_num, value, detail_cell_hedaer_format)
+
+        # worksheet_detail.set_font
+        worksheet_detail.set_row(0, 25)
+        worksheet_detail.set_column("C:C", 15)
+        worksheet_detail.set_column("D:D", 20)
+
+        percent_format = workbook.add_format({"num_format": "0%"})
+        worksheet_detail.set_column("O:O", None, percent_format)
+
         # Close the Pandas Excel writer and output the Excel file.
+        # worksheet_detail.write(0, 0, "TEST")
+
         writer.save()
 
         return True
@@ -237,9 +293,9 @@ def process_generate_cp_file(list_sales, dest_path, calc_month, list_calc_cp):
         for cp in final_list:
             # locale 정보에 따라 컬럼명 리스트 가져오기
             cp_code = cp[0][19]
-            print("** cp code :", cp_code)
+            # print("** cp code :", cp_code)
             cp_calc_info = data_handler.get_cp_info_by_id(cp_code, list_calc_cp)
-            print("current cp info ", cp_calc_info)
+            # print("current cp info ", cp_calc_info)
 
             if not cp_calc_info:
                 print("[Exception] not exist cp :", cp)
@@ -283,6 +339,9 @@ def process_generate_cp_file(list_sales, dest_path, calc_month, list_calc_cp):
                         f"\n[Except Report] - ({except_report_index}), {cp_calc_info[3]}({cp_calc_info[1]}) "
                     )
 
+        # finish
+        # 처리하지 않은 정산서 목록
+        print(f"\n\n*** 예외 처리 필요한 CP 목록 ***\n{except_report_list}")
     except Exception as err:
         print("[Error] process_generate_cp_file : ", err)
         return err

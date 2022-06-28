@@ -9,8 +9,6 @@
         "summary_1_total_title" : "1. 정산 안내",
         "summary_2_detail_title" : "2. 정산 내역",
         "summary_3_prepayments" : "3. 선급내역 (MG, 선인세, 제작비)",
-        "summary_final_memo" :  "- 정산에 대한 상세 내역은 하단의 상세내역 시트에서 확인할 수 있습니다.",
-        "summary_final_memo_contact" :  "- 정산관련문의 : tax@mstoryhub.com",
         "detail_columns":[
             "순번",
             "저작권자",
@@ -36,10 +34,10 @@
             "정산구분"
         ],
         "sum" : "합계",
-        "summary_2_detail_4_headers" : [
+        "summary_2_detail_5_headers" : [
             "내용",	"매출(정산대상)(A)", "정산금(B)", "선급 차감(C)", "지급 예정(B-C)"
         ],
-        "summary_2_detail_5_headers" : [
+        "summary_2_detail_6_headers" : [
             "내용",	"매출(정산대상)(A)", "차감대상(B)",	"매출-차감대상(A-B)", "정산율(C)", "정산금((A-B)*C)" 
         ],
         "summary_1_tax_title" : "(세금)계산서 발행 안내",
@@ -48,38 +46,73 @@
         ],
         "summary_1_tax_headers_personal" : [
             "품목", "정산금", "세액", "합계", "과세여부", "지급예정일"
-        ]
+        ],
+        "summary_common_guide_tax_free" : [
+            " - 정산에 대한 상세 내역은 하단의 상세내역 시트에서 확인할 수 있습니다.",
+            " - 정산관련문의 : tax@mstoryhub.com"
+        ],
+        "summary_common_guide_tax_include" : [
+            " - 정산에 대한 상세 내역은 하단의 상세내역 시트에서 확인할 수 있습니다.",
+            " - 정산관련문의 : tax@mstoryhub.com",
+            " - (세금)계산서 미발행 시 지급이 이월될 수 있습니다."
+        ]  
     },
     "cn": {
-        "year" : "년",
-        "month" : "월", 
-        "calc" : "정산",
-        "sheet_summary" : "정산서",
-        "sheet_detail" : "상세내역",
-        "summary_1_total" : "1. 정산 안내",
-        "summary_2_detail" : "2. 정산 내역",
-        "summary_3_prepayments" : "3. 선급내역 (MG, 선인세, 제작비)",
-        "summary_final_memo" :  "- 정산에 대한 상세 내역은 하단의 상세내역 시트에서 확인할 수 있습니다.",
-        "summary_final_memo_contact" :  "- 정산관련문의 : tax@mstoryhub.com",
+        "year" : "년年",
+        "month" : "월月", 
+        "calc" : "정산明细",
+        "sheet_summary" : "정산서 结算单",
+        "sheet_detail" : "상세내역 明细",
+        "summary_title" : "{0}년年 {1}월月 정산明细",
+        "summary_1_total_title" : "1. (세금)계산서 발행 안내 （税款）报价内容",
+        "summary_2_detail_title" : "2. 정산내역 结算内容",
+        "summary_3_prepayments" : "3. 선급내역 (MG, 선인세, 제작비) 保底明细",
         "detail_columns":[
-            "순번",
-            "판매월",
-            "서비스",
-            "제목",
-            "저자",
-            "출판사",
-            "구매 건수",
-            "구매 금액",
-            "대여 건수",
-            "대여 금액",
-            "취소 건수",
-            "취소 금액",
-            "결제수수료 보정액",
-            "매출\n(구매금액+대여금액-취소금액-제휴사 수수료)",
-            "저작권자 정산율",
-            "저작권자 정산금",
-            "시리즈명",
-            "시리즈번호"
-        ]
+            "순번序号",
+            "저작권자",
+            "판매월售卖月份",
+            "서비스平台",
+            "제목名称",
+            "저자作者",
+            "출판사出版社",
+            "구매 건수购买件数",
+            "구매 금액购买金额",
+            "대여 건수租赁次数",
+            "대여 금액租赁金额",
+            "취소 건수取消件数",
+            "취소 금액取消金额",
+            "결제수수료 보정액结算手续费",
+            "매출销售(구매금액购买金额+대여금액租赁金额-취소금액取消金额-제휴사수수료合作手续费)",
+            "저작권자 정산율版权方净算率",
+            "저작권자 정산금版权方结算金额",
+            "시리즈명作品名称",
+            "시리즈번호作品编号",
+            "cp code",
+            "매출기준",
+            "정산구분"
+        ],
+        "sum" : "합계 合计",
+        "summary_2_detail_5_headers" : [
+            "내용 内容",	"매출(정산대상)(A)\n销售额结算对象", "정산금(B)\n结算金额", "선급 차감(C)抵扣保底", "지급 예정(B-C)\n支付金额"
+        ],
+        "summary_2_detail_6_headers" : [
+            "내용 内容",	"매출(정산대상)(A)\n销售额结算对象", "차감대상(B)",	"매출-차감대상(A-B)", "정산율(C)", "정산금((A-B)*C)\n结算金额" 
+        ],
+        "summary_1_tax_title" : "1. (세금)계산서 발행 안내 （税款）报价内容",
+        "summary_1_tax_headers_company" : [
+            "품목 内容", "공급가액 税后收益", "세액 税额", "합계 合计", "과세여부 是否正税", "지급예정일 支付日期"
+        ],
+        "summary_1_tax_headers_personal" : [
+            "품목 内容", "정산금 结算金额", "세액 税额", "합계 合计", "과세여부 是否正税", "지급예정일 支付日期"
+        ],
+        "summary_common_guide_tax_free" : [
+            " - 정산에 대한 상세 내역은 하단의 상세내역 시트에서 확인할 수 있습니다. 流水可在明细中确认",
+            " - 정산관련문의(结算咨询) : tax@mstoryhub.com"
+        ],
+        "summary_common_guide_tax_include" : [
+            " - 정산에 대한 상세 내역은 하단의 상세내역 시트에서 확인할 수 있습니다. 流水可在明细中确认",
+            " - 정산관련문의(结算咨询) : tax@mstoryhub.com",
+            " - (세금)계산서 미발행 시 지급이 이월될 수 있습니다. 如invoice延迟发行，则支付时间将推迟到次月"
+        ] 
     }
 }

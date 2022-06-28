@@ -1,0 +1,8 @@
+{
+    "HOST": "cms-dev.cz7u5uvdch1j.ap-northeast-2.rds.amazonaws.com",
+    "DBNAME": "mshcms-dev",
+    "USER": "mshdev",
+    "PWD": "mstory!@",
+    "AWS_ACCESS_KEY":"AKIA5TZNI26SPWD53OEQ",
+    "AWS_SECRET_KEY": "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"
+}
