@@ -134,12 +134,16 @@ def get_detail_columns_name(locale):
 # 정산서 요약 시트 데이터 생성
 def generate_calc_summary_data(cp_info, list_sale, calc_month):
     # get cp info - 유형(개인/사업자), 면세 유형(3가지), 언어(한글,한자), 정산금 선/후차감 구분
+    # 42	CPDV00042_01	CPDV00042	동아		사업자	Bi000042CO	동아	총매출	한국	면세	후차감	O	Bi013	0			1	1
     cp_code = cp_info[1]
     cp_biz_type = cp_info[5]  # 사업자 유형
     cp_tax_type = cp_info[10]  # 세금 유형
     cp_calc_lang = cp_info[9]  # 언어
     cp_deduction_type = cp_info[11]  # 정산금 선/후차감
     cp_calc_std = cp_info[8]  # 정산기준 (총매출/순매출)
+
+    # if cp_info[3] == "동아":
+    #     print(f"\n\n동아 sales\n", list_sale)
 
     # final return
     dic_final = {"title": None, "total": None, "detail": None, "prepayment": None}
@@ -212,6 +216,10 @@ def proc_summary_detail(
         if "A선수수익 정산" != item[21]:
             filter_list_sale.append(item)
 
+    # test - 동아
+    # if cp_code == "CPDV00042_01":
+    #     print(f"\n\n\b동아 상세내역 filter after\n{filter_list_sale}\n\n")
+
     # print("\n\n\n*** filter_list_sale \n ", filter_list_sale)
 
     now_series_code = ""  # index-18
@@ -234,22 +242,26 @@ def proc_summary_detail(
                         now_series_prepayment_deduction_sum,
                     ]
                 )
+
                 # init
-                now_series_count = 0
-                now_series_sales_sum = 0
-                now_series_calc_sum = 0
+                now_series_count = 1
+                now_series_sales_sum = item[14]
+                now_series_calc_sum = item[16]
+
+                now_series_code = item[18]
             else:
                 now_series_count += 1
                 now_series_sales_sum += item[14]
                 now_series_calc_sum += item[16]
 
             now_series_title = item[4]
-            now_series_code = item[18]
+            #
         else:
             now_series_count += 1
             now_series_sales_sum += item[14]
             now_series_calc_sum += item[16]
 
+    # end loop > append
     if now_series_count > 0:
         final_list.append(
             [
